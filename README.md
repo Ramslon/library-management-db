@@ -168,7 +168,7 @@ Tracks book borrowing and returns.
 ## Database Setup Instructions
 
 ### Prerequisites
-- Python 3.8-3.12 (Note: Python 3.13 has compatibility issues with current SQLAlchemy version)
+- Python 3.8+ (including Python 3.13 with updated SQLAlchemy)
 - MySQL 5.7+ or MariaDB 10.2+
 - pip (Python package installer)
 
@@ -338,6 +338,25 @@ Members (1) ----< (M) Loans (M) >---- (1) Books
                                               
 Books (M) ----< BookAuthors >---- (M) Authors
 ```
+
+## Troubleshooting
+
+### Python 3.13 Compatibility
+If you encounter SQLAlchemy compatibility issues with Python 3.13:
+- The latest version (SQLAlchemy 2.0.30+) in requirements.txt fixes this
+- Run: `pip install -r requirements.txt` to update dependencies
+
+### Database Connection Issues
+If you see database connection errors:
+1. Ensure MySQL server is running
+2. Create the database: `CREATE DATABASE LibraryDB;`
+3. Update `.env` file with correct credentials
+4. The API will start even without database connection for testing
+
+### Application Won't Start
+- Check if port 8000 is available
+- Try: `python run.py` instead of `uvicorn` directly
+- Check the terminal output for specific error messages
 
 ## Contributing
 

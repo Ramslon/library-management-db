@@ -7,8 +7,8 @@ import os
 from app import crud, models, schemas
 from app.database import SessionLocal, engine, get_db
 
-# Create all tables
-models.Base.metadata.create_all(bind=engine)
+# Create all tables (commented out for development without DB)
+# models.Base.metadata.create_all(bind=engine)
 
 # Initialize FastAPI app
 app = FastAPI(

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, Text, YEAR
+from sqlalchemy import Column, Integer, String, Date, ForeignKey, Text, SmallInteger
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -31,7 +31,7 @@ class Book(Base):
     book_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     title = Column(String(200), nullable=False)
     isbn = Column(String(20), unique=True, nullable=False, index=True)
-    published_year = Column(YEAR)
+    published_year = Column(SmallInteger)
     category_id = Column(Integer, ForeignKey("Categories.category_id"))
     copies_available = Column(Integer, default=1)
     
