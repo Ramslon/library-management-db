@@ -1,6 +1,111 @@
 # Library Database Management System
 
-A comprehensive SQL database schema for managing a library system, including books, members, authors, categories, and loan tracking.
+A comprehensive library management system with SQL database schema and FastAPI CRUD application for managing books, members, authors, categories, and loan tracking.
+
+## Project Components
+
+This project includes:
+1. **Database Schema** (`library_db.sql`) - Complete MySQL database structure
+2. **FastAPI CRUD Application** - RESTful API for library management operations
+3. **Comprehensive Documentation** - Setup instructions and API reference
+
+## FastAPI CRUD Application
+
+The FastAPI application provides a complete REST API for library management with the following features:
+
+- **Member Management**: Create, read, update, and delete library members
+- **Book Management**: Manage books with category relationships
+- **Loan System**: Handle book borrowing and returns
+- **Category Management**: Organize books by categories
+- **Data Validation**: Pydantic schemas for request/response validation
+- **Error Handling**: Comprehensive error responses
+- **Interactive Documentation**: Auto-generated API docs with Swagger UI
+
+### Quick Start
+
+1. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Configure database connection**:
+   - Copy `.env` file and update database credentials
+   - Ensure MySQL server is running
+   - Database will be created automatically
+
+3. **Run the application**:
+   ```bash
+   python run.py
+   ```
+
+4. **Access the API**:
+   - API Documentation: http://localhost:8000/docs
+   - Alternative docs: http://localhost:8000/redoc
+   - API Base URL: http://localhost:8000
+
+### API Endpoints
+
+#### Members
+- `POST /members/` - Create a new member
+- `GET /members/` - Get all members (with pagination)
+- `GET /members/{member_id}` - Get specific member
+- `PUT /members/{member_id}` - Update member information
+- `DELETE /members/{member_id}` - Delete member (if no active loans)
+
+#### Books
+- `POST /books/` - Add a new book
+- `GET /books/` - Get all books (with optional category filtering)
+- `GET /books/{book_id}` - Get specific book
+- `PUT /books/{book_id}` - Update book information
+- `DELETE /books/{book_id}` - Delete book (if no active loans)
+
+#### Categories
+- `POST /categories/` - Create a new category
+- `GET /categories/` - Get all categories
+- `GET /categories/{category_id}` - Get specific category
+
+#### Loans
+- `POST /loans/` - Create a new loan
+- `GET /loans/` - Get loans (with filtering options)
+- `PUT /loans/{loan_id}/return` - Return a borrowed book
+
+### Example API Usage
+
+#### Create a Member
+```bash
+curl -X POST "http://localhost:8000/members/" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "first_name": "John",
+       "last_name": "Doe",
+       "email": "john.doe@email.com",
+       "phone": "555-0123"
+     }'
+```
+
+#### Add a Book
+```bash
+curl -X POST "http://localhost:8000/books/" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "title": "The Great Gatsby",
+       "isbn": "978-0-7432-7356-5",
+       "published_year": 1925,
+       "category_id": 1,
+       "copies_available": 3
+     }'
+```
+
+#### Create a Loan
+```bash
+curl -X POST "http://localhost:8000/loans/" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "member_id": 1,
+       "book_id": 1,
+       "due_date": "2025-10-15"
+     }'
+```
 
 ## Database Schema Overview
 
@@ -60,13 +165,14 @@ Tracks book borrowing and returns.
 - **Unique Constraints**: Prevents duplicate emails, ISBNs, and category names
 - **Many-to-Many Relationships**: Supports books with multiple authors
 
-## Setup Instructions
+## Database Setup Instructions
 
 ### Prerequisites
+- Python 3.8-3.12 (Note: Python 3.13 has compatibility issues with current SQLAlchemy version)
 - MySQL 5.7+ or MariaDB 10.2+
-- MySQL client or database management tool
+- pip (Python package installer)
 
-### Installation Steps
+### Database Installation Steps
 
 1. **Clone the repository**
    ```bash
@@ -74,17 +180,89 @@ Tracks book borrowing and returns.
    cd library-database-system
    ```
 
-2. **Connect to your MySQL server**
+2. **Set up Python environment** (recommended)
    ```bash
-   mysql -u your_username -p
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
    ```
 
-3. **Execute the database script**
-   ```sql
-   source library_db.sql;
+3. **Configure database connection**
+   - Copy `.env.example` to `.env` (if provided) or create `.env` file:
+   ```env
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=your_username
+   DB_PASSWORD=your_password
+   DB_NAME=LibraryDB
    ```
-   
-   Or copy and paste the contents of `library_db.sql` into your MySQL client.
+
+4. **Create database manually** (if needed)
+   ```bash
+   mysql -u your_username -p
+   CREATE DATABASE LibraryDB;
+   ```
+
+5. **Option 1: Use FastAPI (Recommended)**
+   ```bash
+   python run.py
+   ```
+   The application will automatically create tables when started.
+
+6. **Option 2: Manual SQL execution**
+   ```bash
+   mysql -u your_username -p LibraryDB < library_db.sql
+   ```
+
+## Project Structure
+
+```
+library-database-system/
+├── app/
+│   ├── __init__.py          # Package initialization
+│   ├── main.py              # FastAPI application
+│   ├── database.py          # Database connection
+│   ├── models.py            # SQLAlchemy models
+│   ├── schemas.py           # Pydantic schemas
+│   └── crud.py              # CRUD operations
+├── library_db.sql           # Database schema
+├── requirements.txt         # Python dependencies
+├── .env                     # Environment configuration
+├── run.py                   # Application startup script
+└── README.md               # Documentation
+```
+
+## Testing the API
+
+### Using the Interactive Documentation
+1. Start the application: `python run.py`
+2. Open http://localhost:8000/docs in your browser
+3. Use the interactive interface to test endpoints
+
+### Using curl
+Test the health endpoint:
+```bash
+curl http://localhost:8000/health
+```
+
+### Using Python requests
+```python
+import requests
+
+# Test connection
+response = requests.get("http://localhost:8000/health")
+print(response.json())
+
+# Create a member
+member_data = {
+    "first_name": "Alice",
+    "last_name": "Johnson",
+    "email": "alice.johnson@email.com",
+    "phone": "555-0124"
+}
+response = requests.post("http://localhost:8000/members/", json=member_data)
+print(response.json())
+```
 
 ## Usage Examples
 
